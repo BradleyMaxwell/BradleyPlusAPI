@@ -2,9 +2,10 @@
 
 namespace api.Services.Interfaces
 {
-	public interface IAccountService : IService
+	public interface IAccountService
 	{
-		void Create(Account account);
+        Task<Account> Get(string id);
+		Task Create(Account account);
 		void Update(Guid id, Account account);
 		void Delete(Guid id);
 	}

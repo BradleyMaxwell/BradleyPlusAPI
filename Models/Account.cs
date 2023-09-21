@@ -1,28 +1,18 @@
-﻿using System;
-using Amazon.DynamoDBv2.DataModel;
-using api.Schemas;
+﻿using Amazon.DynamoDBv2.DataModel;
 
 namespace api.Models
 {
 	[DynamoDBTable("Accounts")]
-    public class Account
+	public class Account
 	{
-		Guid Id { get; }
-		string Email { get; }
-		string Password { get; }
-        string? CardNumber { get; }
-		DateOnly? CardExpiryDate { get; }
-		//Subscription? Subscription { get; }
+		[DynamoDBHashKey]
+		public string Id { get; set; }
 
-		public Account(Guid id, string email, string password, string? cardNumber, DateOnly? cardExpiryDate)
-		{
-			Id = id;
-			Email = email;
-			Password = password;
-            CardNumber = cardNumber;
-			CardExpiryDate = cardExpiryDate;
-			//Subscription = subscription;
-		}
+		[DynamoDBProperty]
+		public string Email { get; set; }
+
+        [DynamoDBProperty]
+        public string Password { get; set; }
 	}
 }
 

@@ -1,7 +1,6 @@
 ﻿using api.Models;
 using api.Schemas.Requests;
 using Microsoft.AspNetCore.Mvc;
-using Amazon.DynamoDBv2;
 using api.Services.Interfaces;
 
 namespace api.Controllers
@@ -17,28 +16,31 @@ namespace api.Controllers
             _accountService = accountService; // dependancy injection
         }
 
-        [HttpGet("{id:guid}")]
-        public IActionResult GetAccount (Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAccount (string id)
         {
-            return Ok(id);
+            Account account = await _accountService.Get(id);
+            return account != null ? Ok(account) : NotFound();
         }
 
         [HttpPost]
-        public IActionResult CreateAccount (CreateAccountRequest request)
+        public async Task<IActionResult> CreateAccount(CreateAccountRequest request)
         {
             // turn external account request object into an account object
-            Account account = new Account(
-                Guid.NewGuid(),
-                request.Email,
-                request.Password,
-                null,
-                null
-            );
+            Account account = new Account()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = request.Email,
+                Password = request.Password
+            };
 
             // tell the account service provider to create a new account object
-            _accountService.Create(account);
+            await _accountService.Create(account);
 
-            return Ok(account);
+            return CreatedAtAction(
+                actionName: nameof(GetAccount), // the name of the function that can retrieve the created resource
+                routeValues: new { id = account.Id }, // the required parameter for calling the retrieve resource function
+                value: account); // the content being sent back to the frontend when the resource is created
         }
 
         [HttpPatch("{id:guid}")]
