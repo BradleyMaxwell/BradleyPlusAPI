@@ -17,7 +17,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountService, AccountService>(); // tells the api to use the account service as the implementation of the interface
 
 // configuring DynamoDB client and context for the services to use
-BasicAWSCredentials credentials = new BasicAWSCredentials("AKIA3VOBPWVW6RCCDOW7", "WWHpg4R1zOfIDqB4GBO025MKVrdYeB0NIDSFERnG");
+BasicAWSCredentials credentials = new BasicAWSCredentials(
+    Environment.GetEnvironmentVariable("ACCESS_KEY"),
+    Environment.GetEnvironmentVariable("SECRET_KEY"));
 AmazonDynamoDBConfig config = new AmazonDynamoDBConfig() { RegionEndpoint = Amazon.RegionEndpoint.EUWest2 };
 AmazonDynamoDBClient client = new AmazonDynamoDBClient(credentials, config);
 builder.Services.AddSingleton<IAmazonDynamoDB>(client); // dependancy injection when api needs the client to make the context 

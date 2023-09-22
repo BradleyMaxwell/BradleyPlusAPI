@@ -15,7 +15,8 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5184",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ACCESS_KEY_ID": ""
       },
       "dotnetRunMessages": true
     },
@@ -25,7 +26,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7186;http://localhost:5184",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ACCESS_KEY": "AKIA3VOBPWVW4IKYX5MG",
+        "SECRET_KEY": "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"
       },
       "dotnetRunMessages": true
     },
