@@ -15,8 +15,7 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5184",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ACCESS_KEY_ID": ""
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true
     },

@@ -404,4 +404,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
-launchSettings.json
+Properties/launchSettings.json
