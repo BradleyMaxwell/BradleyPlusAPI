@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Principal;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
@@ -18,25 +19,70 @@ namespace api.Services
 			_context = context;
 		}
 
-		public async Task<Account> Get (string id)
+		public async Task<ServiceResult> Get (string id)
 		{
-			return await _context.LoadAsync<Account>(id);
+			try
+			{
+                Account account = await _context.LoadAsync<Account>(id);
+				return ServiceResult.WithData(
+					ServiceResultType.FoundSuccess,
+					"an account was found",
+					account);
+            } catch (Exception exception)
+			{
+				return ServiceResult.WithoutData(
+                    ServiceResultType.InternalError,
+                    "something went wrong when trying to get the account");
+            }
         }
 
-		public async Task Create (Account account)
+		public async Task<ServiceResult> Create (Account account)
 		{
-			await _context.SaveAsync(account);
+			try
+			{
+                await _context.SaveAsync(account);
+				return ServiceResult.WithoutData(
+					ServiceResultType.CreatedSuccess,
+					"account was created");
+            } catch (Exception exception)
+			{
+                return ServiceResult.WithoutData(
+                    ServiceResultType.CreatedSuccess,
+                    "a server error prevented the account from being created");
+            }
         }
 
-		public void Update (Guid id, Account account)
+		public async Task<ServiceResult> Update (Guid id, Account account)
 		{
+            try
+            {
+                return ServiceResult.WithoutData(
+                    ServiceResultType.CreatedSuccess,
+                    "account was created");
+            }
+            catch (Exception exception)
+            {
+                return ServiceResult.WithoutData(
+                    ServiceResultType.CreatedSuccess,
+                    "an error prevented the account from being created");
+            }
+        }
 
-		}
-
-		public void Delete (Guid id)
+		public async Task<ServiceResult> Delete (Guid id)
 		{
-
-		}
+            try
+            {
+                return ServiceResult.WithoutData(
+                    ServiceResultType.CreatedSuccess,
+                    "account was created");
+            }
+            catch (Exception exception)
+            {
+                return ServiceResult.WithoutData(
+                    ServiceResultType.CreatedSuccess,
+                    "an error prevented the account from being created");
+            }
+        }
 	}
 }
 

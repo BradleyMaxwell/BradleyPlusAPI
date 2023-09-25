@@ -4,10 +4,10 @@ namespace api.Services.Interfaces
 {
 	public interface IAccountService
 	{
-        Task<Account> Get(string id);
-		Task Create(Account account);
-		void Update(Guid id, Account account);
-		void Delete(Guid id);
+        Task<ServiceResult> Get(string id);
+		Task<ServiceResult> Create(Account account);
+        Task<ServiceResult> Update(Guid id, Account account);
+        Task<ServiceResult> Delete(Guid id);
 	}
 }
 

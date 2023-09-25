@@ -34,7 +34,7 @@ namespace api.Controllers
                 Password = request.Password
             };
 
-            // tell the account service provider to create a new account object
+            // tell the account service provider to create a new account object and return the appropriate http response based on service result
             await _accountService.Create(account);
 
             return CreatedAtAction(
