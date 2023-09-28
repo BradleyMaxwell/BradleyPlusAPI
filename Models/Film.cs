@@ -1,33 +1,32 @@
-﻿namespace api.Models
+﻿using Amazon.DynamoDBv2.DataModel;
+
+namespace api.Models
 {
-	public enum Genre
-	{
-
-	}
-
 	public class Film
 	{
-		Guid Id { get; }
-		string Title { get; }
-		Genre[] Genres { get; }
-		TimeSpan Duration { get; }
-		string Description { get; }
-		int AgeRating { get; }
-		DateOnly ReleaseDate { get; }
-        DateTime DateAdded { get; }
-		// need to add thumbnail image attribute
+		[DynamoDBHashKey]
+		public string Id { get; set; }
 
-		public Film (Guid id, string title, Genre[] genres, TimeSpan duration, string description, int ageRating, DateOnly releaseDate, DateTime dateAdded)
-		{
-			Id = id;
-			Title = title;
-			Genres = genres;
-			Duration = duration;
-			Description = description;
-			AgeRating = ageRating;
-			ReleaseDate = releaseDate;
-			DateAdded = dateAdded;
-		}
-	}
+		[DynamoDBProperty]
+		public string Title { get; set; }
+
+		[DynamoDBProperty]
+		public int Duration { get; set; } // duration in minutes
+
+        [DynamoDBProperty]
+        public string Description { get; set; }
+
+        [DynamoDBProperty]
+        public int AgeRating { get; set; }
+
+        [DynamoDBProperty]
+        public DateTime ReleaseDate { get; set; }
+
+        [DynamoDBProperty]
+        public DateTime DateAdded { get; set; }
+
+        [DynamoDBProperty]
+        public string ThumbnailId { get; set; } // the unique id which is the filename of the thumbnail in cloud storage
+    }
 }
 

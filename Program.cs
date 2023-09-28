@@ -41,13 +41,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// the following is the pipeline a request goes through
+app.UseExceptionHandler("/error"); // redirect user to this endpoint if any exceptions are raised to protect sensitive information
 app.UseHttpsRedirection();
-
 app.UseCors(PolicyName); // putting the policy created previously into affect, had to go before UseAuthorization because of middleware order
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
 

@@ -1,18 +1,18 @@
-﻿using System;
-namespace api.Services
+﻿namespace api.Utility
 {
     public enum ServiceResultType
     {
-        FoundSuccess,
-        CreatedSuccess,
+        Success,
         InternalError,
         ValidationError,
-        NotFoundError
+        NotFoundError,
+        ConflictError,
+        UnauthorizedError
     }
 
     public readonly struct ServiceResult // returned by services so that the controllers know what response it should sent back to requester
 	{
-		public ServiceResultType Type { get; }
+		public ServiceResultType Type { get; } // used so it is easier to create service results
 		public string Description { get; }
         public object? Data { get; } // some results will require data to be sent back while others will not
 
@@ -32,6 +32,6 @@ namespace api.Services
         {
             return new ServiceResult(resultType, description, null);
         }
-	}
+    }
 }
 

@@ -13,6 +13,9 @@ namespace api.Models
 
         [DynamoDBProperty]
         public string Password { get; set; }
+
+		[DynamoDBProperty]
+		public List<string> UserIds { get; set; } // the user ids that are linked to a given account
 	}
 }
 

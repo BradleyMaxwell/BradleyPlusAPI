@@ -1,23 +1,24 @@
-﻿namespace api.Models
+﻿using Amazon.DynamoDBv2.DataModel;
+
+namespace api.Models
 {
+    [DynamoDBTable("Users")]
 	public class User
 	{
-		Guid Id { get; }
-		Guid Account { get; }
-		string Name { get; }
-		DateOnly DateOfBirth { get; }
-		Film[] Watchlist { get; }
-		Film[] WatchHistory { get; }
+        [DynamoDBHashKey]
+        public string Id { get; set; }
 
-		public User(Guid id, Guid account, string name, DateOnly dateOfBirth, Film[] watchlist, Film[] watchHistory)
-		{
-			Id = id;
-			Account = account;
-			Name = name;
-			DateOfBirth = dateOfBirth;
-			Watchlist = watchlist;
-			WatchHistory = watchHistory;
-		}
-	}
+        [DynamoDBProperty]
+        public string AccountId { get; set; } // the account that the user belongs to
+
+        [DynamoDBProperty]
+        public DateTime DateOfBirth { get; set; }
+
+        [DynamoDBProperty]
+        public List<string> WatchHistoryIds { get; set; } // a list of the ids of the films that the user has watched
+
+        [DynamoDBProperty]
+        public List<string> WatchlistIds { get; set; } // a list of the film ids that the user has marked as films they want to watch
+    }
 }
 
