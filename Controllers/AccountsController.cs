@@ -3,16 +3,21 @@ using api.Schemas.Requests;
 using Microsoft.AspNetCore.Mvc;
 using api.Services.Interfaces;
 using api.Utility;
+using api.Utility.Interfaces;
+using api.Schemas.Responses;
 
 namespace api.Controllers
 {
     public class AccountsController : ApiController // controls what to do for all the account api endpoints
     {
         private readonly IAccountService _accountService; // used to call the database functionality that is abstracted away from the controller
+        private readonly IJwtTokenManager _jwtTokenManager; // used to generate a token if the user successfully logs in
 
-        public AccountsController (IAccountService accountService)
+        public AccountsController (IAccountService accountService, IJwtTokenManager jwtTokenManager)
         {
-            _accountService = accountService; // dependancy injection
+            // dependancy injection
+            _accountService = accountService;
+            _jwtTokenManager = jwtTokenManager;
         }
 
         [HttpGet("{id}")]
@@ -26,7 +31,17 @@ namespace api.Controllers
         public async Task<IActionResult> Login (LoginRequest request) // used for authentication when getting the account
         {
             ServiceResult result = await _accountService.Login(request);
-            return result.Type == ServiceResultType.Success ? Ok(result.Data) : ErrorResponse(result);
+            if (result.Type == ServiceResultType.Success)
+            {
+                // create a JWT access token for the logged in account and send the account info and token back together 
+                Account account = (Account)result.Data; // result.Data is a generic object so it requires type casting, but since it successfully got an account it will work
+                string accessToken = _jwtTokenManager.GenerateToken(account.Id, 30);
+                LoginResponse response = new LoginResponse(account.Id, account.Email, account.Password, account.UserIds, accessToken);
+                return Ok(response);
+            } else
+            {
+                return ErrorResponse(result);
+            }
         }
 
         [HttpPost]

@@ -13,15 +13,15 @@ namespace api.Controllers
 			switch (result.Type)
 			{
 				case ServiceResultType.NotFoundError:
-                    return NotFound();
+                    return NotFound(result.Description);
 				case ServiceResultType.InternalError:
-					return Problem(title: result.Description);
+					return Problem(result.Description);
 				case ServiceResultType.ConflictError:
-					return Conflict();
+					return Conflict(result.Description);
 				case ServiceResultType.ValidationError:
-					return ValidationProblem(title: result.Description);
+					return ValidationProblem(result.Description);
 				case ServiceResultType.UnauthorizedError:
-					return Unauthorized();
+					return Unauthorized(result.Description);
 				default:
 
 					return Problem();

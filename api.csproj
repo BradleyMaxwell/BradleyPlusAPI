@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>ac89b9fe-bbb0-4073-a331-52fa33b3742c</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
@@ -13,6 +14,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.201.12" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +23,8 @@
     <None Remove="Services\" />
     <None Remove="Services\Interfaces\" />
     <None Remove="Utility\" />
+    <None Remove="Utility\Interfaces\" />
+    <None Remove="Schemas\Responses\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -28,5 +32,7 @@
     <Folder Include="Services\" />
     <Folder Include="Services\Interfaces\" />
     <Folder Include="Utility\" />
+    <Folder Include="Utility\Interfaces\" />
+    <Folder Include="Schemas\Responses\" />
   </ItemGroup>
 </Project>

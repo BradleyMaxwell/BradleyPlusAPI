@@ -3,6 +3,8 @@ using Amazon.DynamoDBv2.DataModel;
 using Amazon.Runtime;
 using api.Services;
 using api.Services.Interfaces;
+using api.Utility;
+using api.Utility.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,7 @@ builder.Services.AddSwaggerGen();
 
 // dependancy injections
 builder.Services.AddScoped<IAccountService, AccountService>(); // tells the api to use the account service as the implementation of the interface
+builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
 
 // configuring DynamoDB client and context for the services to use
 BasicAWSCredentials credentials = new BasicAWSCredentials(
