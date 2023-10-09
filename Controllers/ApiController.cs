@@ -1,10 +1,12 @@
 ﻿using System;
 using api.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
 	[ApiController]
+	[Authorize] // specify every controller as requiring authorization unless specified otherwise
 	[Route("[controller]")]
 	public abstract class ApiController : ControllerBase
 	{

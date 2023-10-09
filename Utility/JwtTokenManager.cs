@@ -8,9 +8,15 @@ namespace api.Utility
 {
     public class JwtTokenManager : IJwtTokenManager
     {
-        public string GenerateToken(string userId, int durationMinutes)
+        public enum TokenType // used by a controller to tell the token manager what type of token they want
         {
-            string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
+            Access,
+            Refresh
+        }
+        private readonly string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
+
+        public string GenerateToken(string userId, TokenType tokenType)
+        {
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -24,7 +30,7 @@ namespace api.Utility
                 issuer: "https://localhost:7186", // this would be replaced with the production server url
                 audience: "http://localhost:3000", // the url where this token will be sent to
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(durationMinutes),
+                expires: DateTime.Now.AddMinutes(GetDuration(tokenType)),
                 signingCredentials: signingCredentials
             );
 
@@ -33,9 +39,40 @@ namespace api.Utility
             return tokenString;
         }
 
-        public bool VerifyToken()
+        public bool VerifyToken(string token) // determine whether a given string is a valid token or not
         {
-            return true;
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            TokenValidationParameters validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                RequireExpirationTime = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                return true;
+            } catch (SecurityTokenException) {
+                return false;
+            }
+        }
+
+        private int GetDuration (TokenType tokenType) // used to abstract away hard coding the duration of tokens anywhere else
+        {
+            switch (tokenType)
+            {
+                case TokenType.Access:
+                    return 15; // access tokens need to be short life span so any compromised tokens cannot be used for long
+                case TokenType.Refresh:
+                    return 24 * 60; // refresh tokens need to be longer life span for user experience so the user does not have to perform constant logins
+                default:
+                    return 0; // should never get to this point as the parameter is an enum
+            }
         }
     }
 }

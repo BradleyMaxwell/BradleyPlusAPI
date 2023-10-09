@@ -9,9 +9,9 @@ using api.Utility.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddAuthentication( // adding the middleware for authenticating users before allowing them to use endpoints
+    );
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -48,6 +48,7 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/error"); // redirect user to this endpoint if any exceptions are raised to protect sensitive information
 app.UseHttpsRedirection();
 app.UseCors(PolicyName); // putting the policy created previously into affect, had to go before UseAuthorization because of middleware order
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
