@@ -5,12 +5,22 @@ using api.Services;
 using api.Services.Interfaces;
 using api.Utility;
 using api.Utility.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddAuthentication( // adding the middleware for authenticating users before allowing them to use endpoints
-    );
+JwtTokenManager tokenManager = new JwtTokenManager();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer("Access", options => // adding validation parameters for access tokens
+    {
+        options.TokenValidationParameters = tokenManager.GetTokenValidationParameters(TokenType.Access);
+    })
+    .AddJwtBearer("Refresh", options => // adding validation parameters for refresh tokens
+    {
+        options.TokenValidationParameters = tokenManager.GetTokenValidationParameters(TokenType.Refresh);
+    });
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,7 +42,7 @@ builder.Services.AddScoped<IDynamoDBContext, DynamoDBContext>(); // how the cont
 string PolicyName = "AllowFrontendRequests";
 builder.Services.AddCors(options => // creating new policy that specifies which domains are allowed to make requests
 {
-    options.AddPolicy(name: PolicyName, policy => { policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader(); });
+    options.AddPolicy(name: PolicyName, policy => { policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader().AllowCredentials(); });
 });
 
 var app = builder.Build();
@@ -48,7 +58,7 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/error"); // redirect user to this endpoint if any exceptions are raised to protect sensitive information
 app.UseHttpsRedirection();
 app.UseCors(PolicyName); // putting the policy created previously into affect, had to go before UseAuthorization because of middleware order
-app.UseAuthentication();
+//app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

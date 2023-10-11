@@ -3,21 +3,21 @@ using System.Security.Claims;
 using System.Text;
 using api.Utility.Interfaces;
 using Microsoft.IdentityModel.Tokens;
+using static api.Utility.JwtTokenManager;
 
 namespace api.Utility
 {
+    public enum TokenType // used by a controller to tell the token manager what type of token they want
+    {
+        Access,
+        Refresh
+    }
+
     public class JwtTokenManager : IJwtTokenManager
     {
-        public enum TokenType // used by a controller to tell the token manager what type of token they want
-        {
-            Access,
-            Refresh
-        }
-        private readonly string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
-
         public string GenerateToken(string userId, TokenType tokenType)
         {
-            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetSecretKey(tokenType)));
             SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             Claim[] claims = new[] // list of labels that securely go inside the JWT that describes information about it
@@ -39,20 +39,10 @@ namespace api.Utility
             return tokenString;
         }
 
-        public bool VerifyToken(string token) // determine whether a given string is a valid token or not
+        public bool VerifyToken(string token, TokenType tokenType) // determine whether a given string is a valid token or not
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            TokenValidationParameters validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                RequireExpirationTime = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
+            TokenValidationParameters validationParameters = GetTokenValidationParameters(tokenType);
             try
             {
                 tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
@@ -62,6 +52,21 @@ namespace api.Utility
             }
         }
 
+        public TokenValidationParameters GetTokenValidationParameters (TokenType tokenType) 
+        {
+            TokenValidationParameters validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(GetSecretKey(tokenType))),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                RequireExpirationTime = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            return validationParameters;
+        }
         private int GetDuration (TokenType tokenType) // used to abstract away hard coding the duration of tokens anywhere else
         {
             switch (tokenType)
@@ -72,6 +77,19 @@ namespace api.Utility
                     return 24 * 60; // refresh tokens need to be longer life span for user experience so the user does not have to perform constant logins
                 default:
                     return 0; // should never get to this point as the parameter is an enum
+            }
+        }
+
+        private string GetSecretKey (TokenType tokenType) // get the secret key used to sign and verify JWTs
+        {
+            switch (tokenType)
+            {
+                case TokenType.Access:
+                    return Environment.GetEnvironmentVariable("JWT_ACCESS_SECRET");
+                case TokenType.Refresh:
+                    return Environment.GetEnvironmentVariable("JWT_REFRESH_SECRET");
+                default:
+                    return "";
             }
         }
     }

@@ -6,7 +6,7 @@ namespace api.Utility.Interfaces
 	public interface IJwtTokenManager
 	{
 		public string GenerateToken(string id, TokenType tokenType);
-		public bool VerifyToken(string token);
+		public bool VerifyToken(string token, TokenType tokenType);
 	}
 }
 

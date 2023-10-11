@@ -6,7 +6,8 @@ namespace api.Schemas.Responses
 		string Email,
 		string Password,
         List<string> UserIds,
-		string accessToken
+		string accessToken,
+		string refreshToken // only using refresh token like this because using it as a HttpOnly cookie is not working
         );
 }
 

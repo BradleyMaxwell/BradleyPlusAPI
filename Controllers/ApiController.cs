@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace api.Controllers
 {
 	[ApiController]
-	[Authorize] // specify every controller as requiring authorization unless specified otherwise
 	[Route("[controller]")]
-	public abstract class ApiController : ControllerBase
+    [Authorize(AuthenticationSchemes = "Access")] // require every api endpoint request to come with a valid access token by default
+    public abstract class ApiController : ControllerBase
 	{
 		protected IActionResult ErrorResponse (ServiceResult result) // used to make it easy to return the correct error object by controllers
 		{

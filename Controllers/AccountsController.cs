@@ -7,6 +7,7 @@ using api.Utility.Interfaces;
 using api.Schemas.Responses;
 using static api.Utility.JwtTokenManager;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace api.Controllers
 {
@@ -40,13 +41,11 @@ namespace api.Controllers
                 // create a JWT access token for the logged in account and send the account info and token back together 
                 Account account = (Account)result.Data; // result.Data is a generic object so it requires type casting, but since it successfully got an account it will work
                 string accessToken = _jwtTokenManager.GenerateToken(account.Id, TokenType.Access);
-                LoginResponse response = new LoginResponse(account.Id, account.Email, account.Password, account.UserIds, accessToken);
+                string refreshToken = _jwtTokenManager.GenerateToken(account.Id, TokenType.Refresh);
+                LoginResponse response = new LoginResponse(account.Id, account.Email, account.Password, account.UserIds, accessToken, refreshToken);
 
-                // send the refresh token which is used to get new access tokens as a http only cookie so it cannot be retrieved by javascript and send
-                Response.Cookies.Append(
-                    key: refreshTokenKey,
-                    value: _jwtTokenManager.GenerateToken(account.Id, TokenType.Refresh),
-                    options: new CookieOptions { HttpOnly = true });
+                // WOULD DO THIS BUT COOKIES NOT WORKING - send the refresh token which is used to get new access tokens as a http only cookie so it cannot be retrieved by javascript and send
+                Response.Cookies.Append(refreshTokenKey, refreshToken);
                 return Ok(response);
             } else
             {
@@ -54,16 +53,10 @@ namespace api.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Refresh")] // refreshing the access token requires a refresh token
         [HttpGet("refresh/{id:guid}")]
         public IActionResult RefreshAccessToken (string id) // endpoint used by the client without the user knowing to get new short term access tokens regularly for security
         {
-            // get the http only refresh token and make sure it is present and valid before creating a new token
-            Request.Cookies.TryGetValue(refreshTokenKey, out string refreshToken);
-            if (refreshToken == null || _jwtTokenManager.VerifyToken(refreshToken) == false)
-            {
-                return BadRequest("refresh token is either invalid or not present in the request");
-            }
-
             // generate a new access token and send it back
             string newAccessToken = _jwtTokenManager.GenerateToken(id, TokenType.Access);
             return Ok(new { accessToken = newAccessToken });
